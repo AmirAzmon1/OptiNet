@@ -1,44 +1,52 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  IconButton
+} from '@mui/material';
+import {
+  Dashboard as DashboardIcon,
+  Router as RouterIcon,
+  Settings as SettingsIcon,
+  Logout as LogoutIcon
+} from '@mui/icons-material';
 import styled from 'styled-components';
 
-const Container = styled.div`
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
-
-const Header = styled.header`
+const HomeContainer = styled(Box)`
+  min-height: 100vh;
+  width: 100vw;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 2rem;
+  background: none;
 `;
 
-const Title = styled.h1`
-  color: #333;
-  margin: 0;
+const HeaderBar = styled(Box)`
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 32px;
+  margin-bottom: 24px;
+  position: relative;
 `;
 
-const LogoutButton = styled.button`
-  padding: 0.5rem 1rem;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-
+const StyledCard = styled(Card)`
+  height: 100%;
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   &:hover {
-    background-color: #c82333;
+    transform: translateY(-5px);
   }
-`;
-
-const Content = styled.div`
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 `;
 
 interface HomeProps {
@@ -48,30 +56,72 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const isAuth = localStorage.getItem('isAuthenticated') === 'true';
-    if (!isAuth) {
-      navigate('/login');
-    }
-  }, [navigate]);
-
   const handleLogout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('isAuthenticated');
     navigate('/login');
   };
 
+  const menuItems = [
+    {
+      title: 'Dashboard',
+      icon: <DashboardIcon sx={{ fontSize: 40 }} />,
+      path: '/dashboard',
+      color: '#1976d2'
+    },
+    {
+      title: 'Router List',
+      icon: <RouterIcon sx={{ fontSize: 40 }} />,
+      path: '/routers',
+      color: '#2e7d32'
+    },
+    {
+      title: 'Settings',
+      icon: <SettingsIcon sx={{ fontSize: 40 }} />,
+      path: '/settings',
+      color: '#ed6c02'
+    }
+  ];
+
   return (
-    <Container>
-      <Header>
-        <Title>Welcome to Your Dashboard</Title>
-        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
-      </Header>
-      <Content>
-        <h2>Welcome to your new account!</h2>
-        <p>This is your personal dashboard. You can start adding your content here.</p>
-      </Content>
-    </Container>
+    <HomeContainer>
+      <HeaderBar>
+        <Typography variant="h4" color="primary" sx={{ fontWeight: 500, textAlign: 'center', flex: 1, mb: 5 }}>
+          Welcome to the Router Management System
+        </Typography>
+        <Box sx={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}>
+          <IconButton onClick={handleLogout} color="primary">
+            <LogoutIcon />
+          </IconButton>
+        </Box>
+      </HeaderBar>
+      <Box flex={1} width="100%" display="flex" justifyContent="center" alignItems="flex-start">
+        <Grid container spacing={4} justifyContent="center" alignItems="flex-start" sx={{ maxWidth: 900 }}>
+          {menuItems.map((item) => (
+            <Grid item xs={12} sm={6} md={4} key={item.title} display="flex" justifyContent="center">
+              <StyledCard sx={{ width: 220, minHeight: 260, boxShadow: 3 }}>
+                <CardContent sx={{ textAlign: 'center', py: 4 }}>
+                  <Box sx={{ color: item.color, mb: 2 }}>
+                    {item.icon}
+                  </Box>
+                  <Typography variant="h5" component="div">
+                    {item.title}
+                  </Typography>
+                </CardContent>
+                <CardActions sx={{ justifyContent: 'center', pb: 2, mt: 'auto' }}>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate(item.path)}
+                    sx={{ backgroundColor: item.color }}
+                  >
+                    Enter
+                  </Button>
+                </CardActions>
+              </StyledCard>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </HomeContainer>
   );
 };
 
