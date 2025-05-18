@@ -73,18 +73,18 @@ interface LoginProps {
 }
 
 interface User {
-  email: string;
+  username: string;
   password: string;
-  name: string;
+  familyName: string;
   isAdmin: boolean;
 }
 
 interface UserMap {
-  [email: string]: User;
+  [username: string]: User;
 }
 
 const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -94,12 +94,12 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
     setError('');
 
     // Check for hardcoded admin credentials
-    if (email === 'admin@gmail.com' && password === '1234') {
+    if (username === 'admin' && password === '1234') {
       // Create an admin user object
       const adminUser: User = {
-        email: 'admin@gmail.com',
+        username: 'admin',
         password: '1234',
-        name: 'Admin User',
+        familyName: 'Admin',
         isAdmin: true
       };
 
@@ -111,8 +111,8 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
       const usersMap = JSON.parse(localStorage.getItem('usersMap') || '{}') as UserMap;
       
       // Add admin user to users map if not already there
-      if (!usersMap['admin@gmail.com']) {
-        usersMap['admin@gmail.com'] = adminUser;
+      if (!usersMap['admin']) {
+        usersMap['admin'] = adminUser;
         localStorage.setItem('usersMap', JSON.stringify(usersMap));
       }
       
@@ -123,15 +123,15 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
     // Get users from localStorage
     const usersMap = JSON.parse(localStorage.getItem('usersMap') || '{}') as UserMap;
     
-    // Find user with matching email and password
-    const user = usersMap[email];
+    // Find user with matching username and password
+    const user = usersMap[username];
 
     if (user && user.password === password) {
       setIsAuthenticated(true);
       localStorage.setItem('currentUser', JSON.stringify(user));
       navigate('/home');
     } else {
-      setError('Invalid email or password');
+      setError('Invalid username or password');
     }
   };
 
@@ -140,10 +140,10 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
       <Form onSubmit={handleSubmit}>
         <Title>Login</Title>
         <Input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
         />
         <Input

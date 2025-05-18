@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -68,6 +68,12 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
+const SuccessMessage = styled.div`
+  color: #28a745;
+  margin-top: 1rem;
+  text-align: center;
+`;
+
 const CheckboxContainer = styled.div`
   display: flex;
   align-items: center;
@@ -88,36 +94,73 @@ interface SignupProps {
 }
 
 interface User {
-  email: string;
+  username: string;
   password: string;
-  name: string;
+  familyName: string;
   isAdmin: boolean;
 }
 
 interface UserMap {
-  [email: string]: User;
+  [username: string]: User;
+}
+
+interface Family {
+  id: string;
+  name: string;
+  routerId: string;
+  signupPassword: string;
+  routerIp: string;
+  createdAt: string;
 }
 
 const Signup: React.FC<SignupProps> = ({ setIsAuthenticated }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [familyName, setFamilyName] = useState('');
+  const [familyPassword, setFamilyPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminKey, setAdminKey] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [families, setFamilies] = useState<Family[]>([]);
   const navigate = useNavigate();
+
+  // Fetch families on component mount
+  useEffect(() => {
+    const fetchFamilies = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/families');
+        if (!response.ok) {
+          throw new Error('Failed to fetch families');
+        }
+        const data = await response.json();
+        setFamilies(data);
+      } catch (err) {
+        console.error('Error fetching families:', err);
+        // Try to load from localStorage as fallback
+        const savedFamilies = localStorage.getItem('families');
+        if (savedFamilies) {
+          setFamilies(JSON.parse(savedFamilies));
+        }
+      }
+    };
+
+    fetchFamilies();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
+    // Validate password match
     if (password !== confirmPassword) {
       setError('Passwords do not match!');
       return;
     }
 
-    // If trying to create admin account, check admin key
+    // Validate admin key if admin
     if (isAdmin && adminKey !== 'admin123') {
       setError('Invalid admin key');
       return;
@@ -126,59 +169,61 @@ const Signup: React.FC<SignupProps> = ({ setIsAuthenticated }) => {
     // Get existing users
     const usersMap = JSON.parse(localStorage.getItem('usersMap') || '{}') as UserMap;
     
-    // Check if email already exists
-    if (usersMap[email]) {
-      setError('Email already registered');
+    // Check if username already exists
+    if (usersMap[username]) {
+      setError('Username already registered');
       return;
     }
 
-    // Create new user with admin flag
+    // For non-admin users, validate family credentials
+    if (!isAdmin) {
+      // Find family by name
+      const family = families.find(f => f.name.toLowerCase() === familyName.toLowerCase());
+      
+      if (!family) {
+        setError('Family name not found');
+        return;
+      }
+      
+      // Validate family password
+      if (family.signupPassword !== familyPassword) {
+        setError('Invalid family password');
+        return;
+      }
+    }
+
+    // Create new user
     const newUser: User = {
-      name,
-      email,
+      username,
       password,
+      familyName: isAdmin ? 'Admin' : familyName,
       isAdmin
     };
 
     // Save user
-    usersMap[email] = newUser;
+    usersMap[username] = newUser;
     localStorage.setItem('usersMap', JSON.stringify(usersMap));
     localStorage.setItem('currentUser', JSON.stringify(newUser));
 
-    setIsAuthenticated(true);
-    navigate('/home');
+    setSuccess('Registration successful!');
+    
+    // Redirect after a brief delay to show success message
+    setTimeout(() => {
+      setIsAuthenticated(true);
+      navigate('/home');
+    }, 1500);
   };
 
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
         <Title>Sign Up</Title>
+        
         <Input
           type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <Input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <Input
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
         />
         
@@ -192,7 +237,7 @@ const Signup: React.FC<SignupProps> = ({ setIsAuthenticated }) => {
           <CheckboxLabel htmlFor="adminCheckbox">Register as Admin</CheckboxLabel>
         </CheckboxContainer>
         
-        {isAdmin && (
+        {isAdmin ? (
           <Input
             type="password"
             placeholder="Admin Key"
@@ -200,9 +245,44 @@ const Signup: React.FC<SignupProps> = ({ setIsAuthenticated }) => {
             onChange={(e) => setAdminKey(e.target.value)}
             required
           />
+        ) : (
+          <>
+            <Input
+              type="text"
+              placeholder="Family Name"
+              value={familyName}
+              onChange={(e) => setFamilyName(e.target.value)}
+              required
+            />
+            <Input
+              type="password"
+              placeholder="Family Password"
+              value={familyPassword}
+              onChange={(e) => setFamilyPassword(e.target.value)}
+              required
+            />
+          </>
         )}
         
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        
+        <Input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+        
         {error && <ErrorMessage>{error}</ErrorMessage>}
+        {success && <SuccessMessage>{success}</SuccessMessage>}
+        
         <Button type="submit">Sign Up</Button>
         <LoginLink to="/login">
           Already have an account? Login
