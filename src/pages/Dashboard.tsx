@@ -140,28 +140,22 @@ const Dashboard: React.FC<DashboardProps> = () => {
           Dashboard
         </Typography>
         
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <StatCard sx={{background: (theme) => `linear-gradient(145deg, ${theme.palette.background.paper}, ${theme.palette.background.default})`}}>
-              <Typography variant="h6" color="primary">Total Routers</Typography>
-              <Typography variant="h3" sx={{ mt: 2 }}>24</Typography>
-            </StatCard>
-          </Grid>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 3 }}>
+          <StatCard sx={{background: (theme) => `linear-gradient(145deg, ${theme.palette.background.paper}, ${theme.palette.background.default})`}}>
+            <Typography variant="h6" color="primary">Total Routers</Typography>
+            <Typography variant="h3" sx={{ mt: 2 }}>24</Typography>
+          </StatCard>
           
-          <Grid item xs={12} md={4}>
-            <StatCard sx={{background: (theme) => `linear-gradient(145deg, ${theme.palette.background.paper}, ${theme.palette.background.default})`}}>
-              <Typography variant="h6" color="primary">Active Routers</Typography>
-              <Typography variant="h3" sx={{ mt: 2 }}>18</Typography>
-            </StatCard>
-          </Grid>
+          <StatCard sx={{background: (theme) => `linear-gradient(145deg, ${theme.palette.background.paper}, ${theme.palette.background.default})`}}>
+            <Typography variant="h6" color="primary">Active Routers</Typography>
+            <Typography variant="h3" sx={{ mt: 2 }}>18</Typography>
+          </StatCard>
           
-          <Grid item xs={12} md={4}>
-            <StatCard sx={{background: (theme) => `linear-gradient(145deg, ${theme.palette.background.paper}, ${theme.palette.background.default})`}}>
-              <Typography variant="h6" color="primary">Average Load</Typography>
-              <Typography variant="h3" sx={{ mt: 2 }}>65%</Typography>
-            </StatCard>
-          </Grid>
-        </Grid>
+          <StatCard sx={{background: (theme) => `linear-gradient(145deg, ${theme.palette.background.paper}, ${theme.palette.background.default})`}}>
+            <Typography variant="h6" color="primary">Average Load</Typography>
+            <Typography variant="h3" sx={{ mt: 2 }}>65%</Typography>
+          </StatCard>
+        </Box>
       </Content>
     </DashboardContainer>
   );

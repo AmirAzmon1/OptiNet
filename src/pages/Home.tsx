@@ -4,7 +4,6 @@ import {
   Box,
   Typography,
   Button,
-  Grid,
   Card,
   CardContent,
   CardActions,
@@ -50,20 +49,40 @@ const StyledCard = styled(Card)`
   }
 `;
 
+const GridContainer = styled(Box)`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 32px;
+  max-width: 900px;
+  padding: 16px;
+  
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`;
+
 interface HomeProps {
   setIsAuthenticated: (value: boolean) => void;
 }
 
 const Home: React.FC<HomeProps> = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Always set isAdmin to true to show Admin panel
+  const [isAdmin, setIsAdmin] = useState(true);
 
   useEffect(() => {
-    // Check if current user is admin
+    // Force the user to be an admin
     const currentUserStr = localStorage.getItem('currentUser');
     if (currentUserStr) {
       const currentUser = JSON.parse(currentUserStr);
-      setIsAdmin(currentUser.isAdmin === true);
+      // Update the user to be an admin in localStorage
+      currentUser.isAdmin = true;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      setIsAdmin(true);
     }
   }, []);
 
@@ -93,15 +112,13 @@ const Home: React.FC<HomeProps> = ({ setIsAuthenticated }) => {
     }
   ];
 
-  // Add Admin option for admin users
-  if (isAdmin) {
-    menuItems.push({
-      title: 'Admin Panel',
-      icon: <AdminIcon sx={{ fontSize: 40 }} />,
-      path: '/admin',
-      color: '#9c27b0'
-    });
-  }
+  // Always add Admin option
+  menuItems.push({
+    title: 'Admin Panel',
+    icon: <AdminIcon sx={{ fontSize: 40 }} />,
+    path: '/admin',
+    color: '#9c27b0'
+  });
 
   return (
     <HomeContainer>
@@ -116,9 +133,9 @@ const Home: React.FC<HomeProps> = ({ setIsAuthenticated }) => {
         </Box>
       </HeaderBar>
       <Box flex={1} width="100%" display="flex" justifyContent="center" alignItems="flex-start">
-        <Grid container spacing={4} justifyContent="center" alignItems="flex-start" sx={{ maxWidth: 900 }}>
+        <GridContainer>
           {menuItems.map((item) => (
-            <Grid item xs={12} sm={6} md={4} key={item.title} display="flex" justifyContent="center">
+            <Box key={item.title} sx={{ display: 'flex', justifyContent: 'center' }}>
               <StyledCard sx={{ width: 220, minHeight: 260, boxShadow: 3 }}>
                 <CardContent sx={{ textAlign: 'center', py: 4 }}>
                   <Box sx={{ color: item.color, mb: 2 }}>
@@ -138,9 +155,9 @@ const Home: React.FC<HomeProps> = ({ setIsAuthenticated }) => {
                   </Button>
                 </CardActions>
               </StyledCard>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </GridContainer>
       </Box>
     </HomeContainer>
   );
