@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme, Box } from '@mui/material';
 import styled from 'styled-components';
@@ -8,6 +8,20 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import RouterList from './pages/RouterList';
 import Settings from './pages/Settings';
+import Admin from './pages/Admin';
+
+// Define the User interface
+interface User {
+  email: string;
+  password: string;
+  name: string;
+  isAdmin: boolean;
+}
+
+// Define the UserMap interface
+interface UserMap {
+  [email: string]: User;
+}
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = React.useState(() => {
@@ -19,6 +33,25 @@ function App() {
     const savedMode = localStorage.getItem('darkMode');
     return savedMode === 'true';
   });
+
+  // Ensure default admin user always exists
+  useEffect(() => {
+    const adminUser: User = {
+      email: 'admin@gmail.com',
+      password: '1234',
+      name: 'Admin User',
+      isAdmin: true
+    };
+
+    // Get existing users map
+    const usersMap: UserMap = JSON.parse(localStorage.getItem('usersMap') || '{}');
+    
+    // Add admin user to users map if not already there
+    if (!usersMap['admin@gmail.com']) {
+      usersMap['admin@gmail.com'] = adminUser;
+      localStorage.setItem('usersMap', JSON.stringify(usersMap));
+    }
+  }, []);
 
   const theme = React.useMemo(
     () =>
@@ -44,6 +77,16 @@ function App() {
   const handleThemeChange = (value: boolean) => {
     setDarkMode(value);
     localStorage.setItem('darkMode', value.toString());
+  };
+
+  // Helper function to check if user is admin
+  const isAdmin = () => {
+    const currentUserStr = localStorage.getItem('currentUser');
+    if (currentUserStr) {
+      const currentUser = JSON.parse(currentUserStr);
+      return currentUser.isAdmin === true;
+    }
+    return false;
   };
 
   return (
@@ -83,6 +126,15 @@ function App() {
                 isAuthenticated ? 
                   <Settings darkMode={darkMode} onThemeChange={handleThemeChange} /> : 
                   <Navigate to="/login" replace />
+              } 
+            />
+            {/* Admin route with admin-only access */}
+            <Route 
+              path="/admin" 
+              element={
+                isAuthenticated && isAdmin() ? 
+                  <Admin darkMode={darkMode} /> : 
+                  <Navigate to="/home" replace />
               } 
             />
             <Route path="/" element={<Navigate to="/login" replace />} />

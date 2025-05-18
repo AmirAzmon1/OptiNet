@@ -68,6 +68,21 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0;
+`;
+
+const Checkbox = styled.input`
+  margin-right: 8px;
+`;
+
+const CheckboxLabel = styled.label`
+  font-size: 1rem;
+  color: #333;
+`;
+
 interface SignupProps {
   setIsAuthenticated: (value: boolean) => void;
 }
@@ -76,6 +91,7 @@ interface User {
   email: string;
   password: string;
   name: string;
+  isAdmin: boolean;
 }
 
 interface UserMap {
@@ -87,6 +103,8 @@ const Signup: React.FC<SignupProps> = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminKey, setAdminKey] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -99,6 +117,12 @@ const Signup: React.FC<SignupProps> = ({ setIsAuthenticated }) => {
       return;
     }
 
+    // If trying to create admin account, check admin key
+    if (isAdmin && adminKey !== 'admin123') {
+      setError('Invalid admin key');
+      return;
+    }
+
     // Get existing users
     const usersMap = JSON.parse(localStorage.getItem('usersMap') || '{}') as UserMap;
     
@@ -108,11 +132,12 @@ const Signup: React.FC<SignupProps> = ({ setIsAuthenticated }) => {
       return;
     }
 
-    // Create new user
+    // Create new user with admin flag
     const newUser: User = {
       name,
       email,
-      password
+      password,
+      isAdmin
     };
 
     // Save user
@@ -156,6 +181,27 @@ const Signup: React.FC<SignupProps> = ({ setIsAuthenticated }) => {
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
+        
+        <CheckboxContainer>
+          <Checkbox
+            type="checkbox"
+            id="adminCheckbox"
+            checked={isAdmin}
+            onChange={(e) => setIsAdmin(e.target.checked)}
+          />
+          <CheckboxLabel htmlFor="adminCheckbox">Register as Admin</CheckboxLabel>
+        </CheckboxContainer>
+        
+        {isAdmin && (
+          <Input
+            type="password"
+            placeholder="Admin Key"
+            value={adminKey}
+            onChange={(e) => setAdminKey(e.target.value)}
+            required
+          />
+        )}
+        
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <Button type="submit">Sign Up</Button>
         <LoginLink to="/login">

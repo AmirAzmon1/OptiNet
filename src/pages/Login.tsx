@@ -76,6 +76,7 @@ interface User {
   email: string;
   password: string;
   name: string;
+  isAdmin: boolean;
 }
 
 interface UserMap {
@@ -91,6 +92,33 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Check for hardcoded admin credentials
+    if (email === 'admin@gmail.com' && password === '1234') {
+      // Create an admin user object
+      const adminUser: User = {
+        email: 'admin@gmail.com',
+        password: '1234',
+        name: 'Admin User',
+        isAdmin: true
+      };
+
+      // Set authentication and save admin user
+      setIsAuthenticated(true);
+      localStorage.setItem('currentUser', JSON.stringify(adminUser));
+      
+      // Get existing users map
+      const usersMap = JSON.parse(localStorage.getItem('usersMap') || '{}') as UserMap;
+      
+      // Add admin user to users map if not already there
+      if (!usersMap['admin@gmail.com']) {
+        usersMap['admin@gmail.com'] = adminUser;
+        localStorage.setItem('usersMap', JSON.stringify(usersMap));
+      }
+      
+      navigate('/home');
+      return;
+    }
 
     // Get users from localStorage
     const usersMap = JSON.parse(localStorage.getItem('usersMap') || '{}') as UserMap;

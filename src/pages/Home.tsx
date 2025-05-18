@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -14,7 +14,8 @@ import {
   Dashboard as DashboardIcon,
   Router as RouterIcon,
   Settings as SettingsIcon,
-  Logout as LogoutIcon
+  Logout as LogoutIcon,
+  AdminPanelSettings as AdminIcon
 } from '@mui/icons-material';
 import styled from 'styled-components';
 
@@ -55,6 +56,16 @@ interface HomeProps {
 
 const Home: React.FC<HomeProps> = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Check if current user is admin
+    const currentUserStr = localStorage.getItem('currentUser');
+    if (currentUserStr) {
+      const currentUser = JSON.parse(currentUserStr);
+      setIsAdmin(currentUser.isAdmin === true);
+    }
+  }, []);
 
   const handleLogout = () => {
     setIsAuthenticated(false);
@@ -81,6 +92,16 @@ const Home: React.FC<HomeProps> = ({ setIsAuthenticated }) => {
       color: '#ed6c02'
     }
   ];
+
+  // Add Admin option for admin users
+  if (isAdmin) {
+    menuItems.push({
+      title: 'Admin Panel',
+      icon: <AdminIcon sx={{ fontSize: 40 }} />,
+      path: '/admin',
+      color: '#9c27b0'
+    });
+  }
 
   return (
     <HomeContainer>
