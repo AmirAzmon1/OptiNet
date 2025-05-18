@@ -9,6 +9,9 @@ import Dashboard from './pages/Dashboard';
 import RouterList from './pages/RouterList';
 import Settings from './pages/Settings';
 import Admin from './pages/Admin';
+import UserPage from './pages/UserPage';
+import FamilyPage from './pages/FamilyPage';
+import NetworkPage from './pages/NetworkPage';
 
 // Define the User interface
 interface User {
@@ -125,6 +128,31 @@ function App() {
               element={
                 isAuthenticated ? 
                   <Settings darkMode={darkMode} onThemeChange={handleThemeChange} /> : 
+                  <Navigate to="/login" replace />
+              } 
+            />
+            {/* User, Family and Network routes */}
+            <Route 
+              path="/user" 
+              element={
+                isAuthenticated ? 
+                  <UserPage /> : 
+                  <Navigate to="/login" replace />
+              } 
+            />
+            <Route 
+              path="/family" 
+              element={
+                isAuthenticated ? 
+                  <FamilyPage /> : 
+                  <Navigate to="/login" replace />
+              } 
+            />
+            <Route 
+              path="/network" 
+              element={
+                isAuthenticated ? 
+                  <NetworkPage /> : 
                   <Navigate to="/login" replace />
               } 
             />
