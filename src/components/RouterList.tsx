@@ -3,17 +3,12 @@ import styled from 'styled-components';
 
 interface Neighbor {
   name: string;
-  ip_address: string;
+  ip: string;
+  interface: string;
   latency: number;
-  speed: number;
-  load: number;
-  status: string;
-  packet_loss: number;
-  uptime: number;
-  last_checked: string;
-  rating: number;
-  is_current_route: boolean;
-  avg_response_time: number;
+  traffic: number;
+  score: number;
+  active_clients: number;
 }
 
 const Container = styled.div`
@@ -51,16 +46,9 @@ const Th = styled.th`
   &:nth-child(3),
   &:nth-child(4),
   &:nth-child(5),
-  &:nth-child(7),
-  &:nth-child(8),
-  &:nth-child(11) {
-    text-align: right;
-  }
-
   &:nth-child(6),
-  &:nth-child(9),
-  &:nth-child(10) {
-    text-align: center;
+  &:nth-child(7) {
+    text-align: right;
   }
 `;
 
@@ -72,62 +60,19 @@ const Td = styled.td`
   &:nth-child(3),
   &:nth-child(4),
   &:nth-child(5),
-  &:nth-child(7),
-  &:nth-child(8),
-  &:nth-child(11) {
-    text-align: right;
-  }
-
   &:nth-child(6),
-  &:nth-child(9),
-  &:nth-child(10) {
-    text-align: center;
+  &:nth-child(7) {
+    text-align: right;
   }
 `;
 
-const Tr = styled.tr<{ isCurrentRoute?: boolean }>`
-  background-color: ${props => props.isCurrentRoute ? '#e3f2fd' : 'white'};
+const Tr = styled.tr`
+  background-color: white;
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: ${props => props.isCurrentRoute ? '#bbdefb' : '#f5f5f5'};
+    background-color: #f5f5f5;
   }
-`;
-
-const StatusBadge = styled.span<{ status: string }>`
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: capitalize;
-  background-color: ${props => {
-    switch (props.status) {
-      case 'active': return '#e8f5e9';
-      case 'maintenance': return '#fff3e0';
-      case 'inactive': return '#ffebee';
-      default: return '#f5f5f5';
-    }
-  }};
-  color: ${props => {
-    switch (props.status) {
-      case 'active': return '#2e7d32';
-      case 'maintenance': return '#ef6c00';
-      case 'inactive': return '#c62828';
-      default: return '#616161';
-    }
-  }};
-`;
-
-const RatingStars = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-`;
-
-const Star = styled.span<{ filled: boolean }>`
-  color: ${props => props.filled ? '#ffd700' : '#e0e0e0'};
-  font-size: 16px;
 `;
 
 const LoadingContainer = styled.div`
@@ -192,46 +137,23 @@ const RouterList: React.FC = () => {
             <tr>
               <Th>Name</Th>
               <Th>IP Address</Th>
+              <Th>Interface</Th>
               <Th>Latency (ms)</Th>
-              <Th>Speed (Mbps)</Th>
-              <Th>Load (%)</Th>
-              <Th>Status</Th>
-              <Th>Packet Loss (%)</Th>
-              <Th>Uptime (days)</Th>
-              <Th>Last Checked</Th>
-              <Th>Rating</Th>
-              <Th>Avg Response (ms)</Th>
+              <Th>Traffic (bytes)</Th>
+              <Th>Score</Th>
+              <Th>Active Clients</Th>
             </tr>
           </thead>
           <tbody>
             {neighbors.map((neighbor, index) => (
-              <Tr key={index} isCurrentRoute={neighbor.is_current_route}>
+              <Tr key={index}>
                 <Td>{neighbor.name}</Td>
-                <Td>{neighbor.ip_address}</Td>
-                <Td>{neighbor.latency.toFixed(2)}</Td>
-                <Td>{neighbor.speed}</Td>
-                <Td>{neighbor.load.toFixed(2)}</Td>
-                <Td>
-                  <StatusBadge status={neighbor.status}>
-                    {neighbor.status}
-                  </StatusBadge>
-                </Td>
-                <Td>{neighbor.packet_loss.toFixed(2)}</Td>
-                <Td>{neighbor.uptime}</Td>
-                <Td>{new Date(neighbor.last_checked).toLocaleString()}</Td>
-                <Td>
-                  <RatingStars>
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} filled={i < Math.round(neighbor.rating)}>
-                        ★
-                      </Star>
-                    ))}
-                    <span style={{ marginLeft: '4px', fontSize: '12px', color: '#666' }}>
-                      ({neighbor.rating.toFixed(1)})
-                    </span>
-                  </RatingStars>
-                </Td>
-                <Td>{neighbor.avg_response_time.toFixed(2)}</Td>
+                <Td>{neighbor.ip}</Td>
+                <Td>{neighbor.interface}</Td>
+                <Td>{neighbor.latency?.toFixed(2) || 'N/A'}</Td>
+                <Td>{neighbor.traffic?.toLocaleString() || 'N/A'}</Td>
+                <Td>{(neighbor.score * 100)?.toFixed(1)}%</Td>
+                <Td>{neighbor.active_clients}</Td>
               </Tr>
             ))}
           </tbody>

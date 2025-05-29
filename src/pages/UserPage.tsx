@@ -167,7 +167,7 @@ const UserPage: React.FC = () => {
       </WelcomeMessage>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid component="div" item xs={12} md={6}>
           <Section elevation={2}>
             <Typography variant="h6" gutterBottom>
               Personal Information
@@ -195,7 +195,7 @@ const UserPage: React.FC = () => {
           </Section>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid component="div" item xs={12} md={6}>
           <Section elevation={2}>
             <Typography variant="h6" gutterBottom>
               Family Information

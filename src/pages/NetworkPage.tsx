@@ -5,7 +5,6 @@ import {
   Button,
   Typography,
   Paper,
-  Grid,
   Table,
   TableBody,
   TableCell,
@@ -13,7 +12,8 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import { ArrowBack as ArrowBackIcon, Person as PersonIcon, FamilyRestroom as FamilyIcon } from '@mui/icons-material';
+import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import { RouterStatus } from '../components/RouterStatus';
 
 const Container = styled.div`
   padding: 24px;
@@ -78,7 +78,7 @@ const NetworkPage: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title>All Users</Title>
+        <Title>Network Status</Title>
         <Button
           variant="outlined"
           startIcon={<ArrowBackIcon />}
@@ -88,6 +88,15 @@ const NetworkPage: React.FC = () => {
         </Button>
       </Header>
 
+      {/* Router Status Section */}
+      <Section elevation={2}>
+        <Typography variant="h6" gutterBottom>
+          Smart Router Status
+        </Typography>
+        <RouterStatus />
+      </Section>
+
+      {/* Users Section */}
       <Section elevation={2}>
         <Typography variant="h6" gutterBottom>
           Registered Users
@@ -106,7 +115,7 @@ const NetworkPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {allUsers.map((user) => (
+                {allUsers.map((user: UserData) => (
                   <TableRow key={user.username}>
                     <TableCell>{user.username}</TableCell>
                     <TableCell>{user.familyName}</TableCell>

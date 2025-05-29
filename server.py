@@ -3,101 +3,53 @@ from flask_cors import CORS
 import random
 from datetime import datetime, timedelta
 import time
-from flask import Flask, jsonify
-from router_connection import connect_to_router, generate_real_neighbors
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Store families in memory instead of file
+def generate_random_neighbor():
+    # Generate random values within realistic ranges
+    return {
+        "name": f"Router-{random.randint(1, 100)}",
+        "ip": f"192.168.{random.randint(1, 255)}.{random.randint(1, 255)}",
+        "interface": random.choice(["eth0", "wlan0", "ppp0"]),
+        "latency": round(random.uniform(1, 100), 2),  # ms
+        "traffic": random.randint(1000, 1000000),  # bytes
+        "score": round(random.uniform(0, 1), 2),  # 0-1 score
+        "active_clients": random.randint(1, 50)  # number of active clients
+    }
 
-import subprocess
-import subprocess
-import time
-import random
-from datetime import datetime
-
-ssh_client = None
-
-# התחברות אוטומטית כשמריצים את השרת
-def setup():
-    global ssh_client
-    ssh_client = connect_to_router()
-    if ssh_client:
-        print("✅ Connected to router")
-    else:
-        print("❌ Failed to connect to router")
-
-@app.before_request
-def check_connection():
-    if ssh_client is None:
-        return jsonify({"error": "Router not connected"}), 503
+def generate_random_client():
+    return {
+        "ip": f"192.168.{random.randint(1, 255)}.{random.randint(1, 255)}",
+        "assigned_to": f"Router-{random.randint(1, 5)}",
+        "state": random.choice(["connected", "disconnected", "pending"])
+    }
 
 @app.route("/api/test")
 def test():
     return jsonify({"msg": "everything works!"})
 
-
-from router_connection import generate_real_neighbors
-
 @app.route("/api/neighbors", methods=["GET"])
 def get_neighbors():
-    return jsonify(generate_real_neighbors(ssh_client))
+    # Generate 3-5 random neighbors
+    neighbors = [generate_random_neighbor() for _ in range(random.randint(3, 5))]
+    return jsonify(neighbors)
 
+@app.route("/api/clients", methods=["GET"])
+def get_clients():
+    # Generate 5-10 random clients
+    clients = [generate_random_client() for _ in range(random.randint(5, 10))]
+    return jsonify(clients)
 
-
-# def generate_random_neighbor():
-#     # Generate random values within realistic ranges
-#     return {
-#         "name": f"Router-{random.randint(1, 100)}",
-#         "ip_address": f"192.168.{random.randint(1, 255)}.{random.randint(1, 255)}",
-#         "latency": round(random.uniform(1, 100), 2),  # ms
-#         "speed": random.randint(10, 1000),  # Mbps
-#         "load": round(random.uniform(0, 100), 2),  # percentage
-#         "status": random.choice(["active", "inactive", "maintenance"]),
-#         "packet_loss": round(random.uniform(0, 5), 2),  # percentage
-#         "uptime": random.randint(1, 365),  # days
-#         "last_checked": (datetime.now() - timedelta(minutes=random.randint(1, 60))).isoformat(),
-#         "rating": round(random.uniform(1, 5), 1),  # 1-5 stars
-#         "is_current_route": random.choice([True, False]),
-#         "avg_response_time": round(random.uniform(10, 200), 2)  # ms
-#     }
-
-
-# @app.route('/api/neighbors', methods=['GET'])
-# def get_neighbors():
-#     # Generate 3 random neighbors
-#     neighbors = [generate_random_neighbor() for _ in range(3)]
-#     return jsonify(neighbors)
-
-@app.route('/api/families', methods=['GET'])
-def get_families():
-    try:
-        # Return families from memory
-        return jsonify(FAMILIES)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/families', methods=['POST'])
-def save_families():
-    try:
-        # Update the global FAMILIES variable
-        global FAMILIES
-        FAMILIES = request.json
-        return jsonify({"success": True})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/families/<family_id>', methods=['DELETE'])
-def delete_family(family_id):
-    try:
-        # Filter out the family with the given ID
-        global FAMILIES
-        FAMILIES = [family for family in FAMILIES if family.get('id') != family_id]
-        return jsonify({"success": True})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+@app.route("/api/assignments", methods=["GET"])
+def get_assignments():
+    # Generate random assignments
+    assignments = {}
+    for _ in range(random.randint(5, 10)):
+        ip = f"192.168.{random.randint(1, 255)}.{random.randint(1, 255)}"
+        assignments[ip] = f"Router-{random.randint(1, 5)}"
+    return jsonify(assignments)
 
 if __name__ == '__main__':
-    setup()
     app.run(host='0.0.0.0', port=5000, debug=True)
