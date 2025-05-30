@@ -15,10 +15,21 @@ export interface ConnectedClient {
   ip: string;
   assigned_to: string;
   state: string;
+  score: number;
 }
 
 export interface UserAssignments {
-  [key: string]: string;
+  [key: string]: {
+    interface: string;
+    ip: string;
+    latency: number;
+    load: number;
+    name: string;
+    score: number;
+    table: string;
+    table_id: string;
+    traffic: number;
+  };
 }
 
 // API Configuration
@@ -35,19 +46,19 @@ export function useRouterData() {
   const fetchAllData = async () => {
     try {
       // Fetch neighbors data
-      const neighborsResponse = await fetch(`${API_BASE_URL}/api/neighbors`);
+      const neighborsResponse = await fetch(`${API_BASE_URL}/neighbors`);
       if (!neighborsResponse.ok) throw new Error('Failed to fetch neighbors data');
       const neighborsData = await neighborsResponse.json();
       setNeighborNetworks(neighborsData);
 
       // Fetch clients data
-      const clientsResponse = await fetch(`${API_BASE_URL}/api/clients`);
+      const clientsResponse = await fetch(`${API_BASE_URL}/clients`);
       if (!clientsResponse.ok) throw new Error('Failed to fetch clients data');
       const clientsData = await clientsResponse.json();
       setConnectedClients(clientsData);
 
       // Fetch assignments data
-      const assignmentsResponse = await fetch(`${API_BASE_URL}/api/assignments`);
+      const assignmentsResponse = await fetch(`${API_BASE_URL}/assignments`);
       if (!assignmentsResponse.ok) throw new Error('Failed to fetch assignments data');
       const assignmentsData = await assignmentsResponse.json();
       setUserAssignments(assignmentsData);

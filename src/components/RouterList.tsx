@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 interface Neighbor {
-  name: string;
-  ip: string;
+  clients_active: number;
+  clients_inactive: number;
+  clients_maybe: number;
   interface: string;
+  ip: string;
   latency: number;
-  traffic: number;
+  load: number;
   score: number;
-  active_clients: number;
+  ssid: string;
+  traffic: number;
 }
 
 const Container = styled.div`
@@ -100,7 +103,7 @@ const RouterList: React.FC = () => {
 
   const fetchNeighbors = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/neighbors');
+      const response = await fetch('http://192.168.1.57:5000/neighbors');
       if (!response.ok) {
         throw new Error('Failed to fetch neighbors');
       }
@@ -135,25 +138,31 @@ const RouterList: React.FC = () => {
         <Table>
           <thead>
             <tr>
-              <Th>Name</Th>
               <Th>IP Address</Th>
               <Th>Interface</Th>
+              <Th>SSID</Th>
               <Th>Latency (ms)</Th>
               <Th>Traffic (bytes)</Th>
+              <Th>Load</Th>
               <Th>Score</Th>
               <Th>Active Clients</Th>
+              <Th>Clients Inactive</Th>
+              <Th>Clients Maybe</Th>
             </tr>
           </thead>
           <tbody>
             {neighbors.map((neighbor, index) => (
               <Tr key={index}>
-                <Td>{neighbor.name}</Td>
                 <Td>{neighbor.ip}</Td>
                 <Td>{neighbor.interface}</Td>
+                <Td>{neighbor.ssid || 'N/A'}</Td>
                 <Td>{neighbor.latency?.toFixed(2) || 'N/A'}</Td>
                 <Td>{neighbor.traffic?.toLocaleString() || 'N/A'}</Td>
+                <Td>{neighbor.load || 'N/A'}</Td>
                 <Td>{(neighbor.score * 100)?.toFixed(1)}%</Td>
-                <Td>{neighbor.active_clients}</Td>
+                <Td>{neighbor.clients_active ?? 'N/A'}</Td>
+                <Td>{neighbor.clients_inactive ?? 'N/A'}</Td>
+                <Td>{neighbor.clients_maybe ?? 'N/A'}</Td>
               </Tr>
             ))}
           </tbody>

@@ -63,15 +63,15 @@ export const RouterStatus: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {neighborNetworks.map((network: NeighborNetwork) => (
-              <TableRow key={network.name}>
-                <TableCell>{network.name}</TableCell>
-                <TableCell>{network.ip}</TableCell>
-                <TableCell>{network.interface}</TableCell>
-                <TableCell>{network.latency.toFixed(1)}</TableCell>
-                <TableCell>{network.traffic.toLocaleString()}</TableCell>
-                <TableCell>{(network.score * 100).toFixed(1)}%</TableCell>
-                <TableCell>{network.active_clients}</TableCell>
+            {neighborNetworks.map((network: NeighborNetwork, index) => (
+              <TableRow key={network.name || index}>
+                <TableCell>{network.name || 'N/A'}</TableCell>
+                <TableCell>{network.ip || 'N/A'}</TableCell>
+                <TableCell>{network.interface || 'N/A'}</TableCell>
+                <TableCell>{network.latency?.toFixed(1) || 'N/A'}</TableCell>
+                <TableCell>{network.traffic?.toLocaleString() || 'N/A'}</TableCell>
+                <TableCell>{(typeof network.score === 'number' ? (network.score * 100).toFixed(1) : 'N/A')}%</TableCell>
+                <TableCell>{network.active_clients ?? 'N/A'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -89,14 +89,16 @@ export const RouterStatus: React.FC = () => {
               <TableCell>IP Address</TableCell>
               <TableCell>Assigned Network</TableCell>
               <TableCell>State</TableCell>
+              <TableCell>Score</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {connectedClients.map((client: ConnectedClient) => (
-              <TableRow key={client.ip}>
-                <TableCell>{client.ip}</TableCell>
-                <TableCell>{client.assigned_to}</TableCell>
-                <TableCell>{client.state}</TableCell>
+            {connectedClients.map((client: ConnectedClient, index) => (
+              <TableRow key={client.ip || index}>
+                <TableCell>{client.ip || 'N/A'}</TableCell>
+                <TableCell>{client.assigned_to || 'N/A'}</TableCell>
+                <TableCell>{client.state || 'N/A'}</TableCell>
+                <TableCell>{typeof client.score === 'number' ? client.score.toFixed(3) : 'N/A'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -116,10 +118,10 @@ export const RouterStatus: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Object.entries(userAssignments).map(([ip, network]) => (
-              <TableRow key={ip}>
-                <TableCell>{ip}</TableCell>
-                <TableCell>{network}</TableCell>
+            {Object.entries(userAssignments).map(([ip, network], index) => (
+              <TableRow key={ip || index}>
+                <TableCell>{ip || 'N/A'}</TableCell>
+                <TableCell>{network.name || 'N/A'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
