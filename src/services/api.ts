@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react';
 
 // Types
 export interface NeighborNetwork {
-  name: string;
-  ip: string;
+  clients_active: number;
+  clients_inactive: number;
+  clients_maybe: number;
   interface: string;
+  ip: string;
   latency: number;
-  traffic: number;
   score: number;
-  active_clients: number;
+  ssid: string;
+  traffic_rate: number;
 }
 
 export interface ConnectedClient {

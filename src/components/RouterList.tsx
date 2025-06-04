@@ -8,10 +8,9 @@ interface Neighbor {
   interface: string;
   ip: string;
   latency: number;
-  load: number;
   score: number;
   ssid: string;
-  traffic: number;
+  traffic_rate: number;
 }
 
 const Container = styled.div`
@@ -142,8 +141,7 @@ const RouterList: React.FC = () => {
               <Th>Interface</Th>
               <Th>SSID</Th>
               <Th>Latency (ms)</Th>
-              <Th>Traffic (bytes)</Th>
-              <Th>Load</Th>
+              <Th>Traffic Rate</Th>
               <Th>Score</Th>
               <Th>Active Clients</Th>
               <Th>Clients Inactive</Th>
@@ -157,8 +155,7 @@ const RouterList: React.FC = () => {
                 <Td>{neighbor.interface}</Td>
                 <Td>{neighbor.ssid || 'N/A'}</Td>
                 <Td>{neighbor.latency?.toFixed(2) || 'N/A'}</Td>
-                <Td>{neighbor.traffic?.toLocaleString() || 'N/A'}</Td>
-                <Td>{neighbor.load || 'N/A'}</Td>
+                <Td>{neighbor.traffic_rate?.toLocaleString() || 'N/A'}</Td>
                 <Td>{(neighbor.score * 100)?.toFixed(1)}%</Td>
                 <Td>{neighbor.clients_active ?? 'N/A'}</Td>
                 <Td>{neighbor.clients_inactive ?? 'N/A'}</Td>

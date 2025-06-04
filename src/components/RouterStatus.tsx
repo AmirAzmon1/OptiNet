@@ -53,25 +53,29 @@ export const RouterStatus: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Network Name</TableCell>
-              <TableCell>IP</TableCell>
+              <TableCell>IP Address</TableCell>
               <TableCell>Interface</TableCell>
+              <TableCell>SSID</TableCell>
               <TableCell>Latency (ms)</TableCell>
-              <TableCell>Traffic (bytes)</TableCell>
+              <TableCell>Traffic Rate</TableCell>
               <TableCell>Score</TableCell>
               <TableCell>Active Clients</TableCell>
+              <TableCell>Clients Inactive</TableCell>
+              <TableCell>Clients Maybe</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {neighborNetworks.map((network: NeighborNetwork, index) => (
-              <TableRow key={network.name || index}>
-                <TableCell>{network.name || 'N/A'}</TableCell>
+              <TableRow key={network.ip || index}>
                 <TableCell>{network.ip || 'N/A'}</TableCell>
                 <TableCell>{network.interface || 'N/A'}</TableCell>
-                <TableCell>{network.latency?.toFixed(1) || 'N/A'}</TableCell>
-                <TableCell>{network.traffic?.toLocaleString() || 'N/A'}</TableCell>
-                <TableCell>{(typeof network.score === 'number' ? (network.score * 100).toFixed(1) : 'N/A')}%</TableCell>
-                <TableCell>{network.active_clients ?? 'N/A'}</TableCell>
+                <TableCell>{network.ssid || 'N/A'}</TableCell>
+                <TableCell>{network.latency?.toFixed(2) || 'N/A'}</TableCell>
+                <TableCell>{network.traffic_rate?.toLocaleString() || 'N/A'}</TableCell>
+                <TableCell>{network.score?.toFixed(2) || 'N/A'}</TableCell>
+                <TableCell>{network.clients_active ?? 'N/A'}</TableCell>
+                <TableCell>{network.clients_inactive ?? 'N/A'}</TableCell>
+                <TableCell>{network.clients_maybe ?? 'N/A'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
