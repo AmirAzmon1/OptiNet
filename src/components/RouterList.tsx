@@ -156,7 +156,7 @@ const RouterList: React.FC = () => {
                 <Td>{neighbor.ssid || 'N/A'}</Td>
                 <Td>{neighbor.latency?.toFixed(2) || 'N/A'}</Td>
                 <Td>{neighbor.traffic_rate?.toLocaleString() || 'N/A'}</Td>
-                <Td>{(neighbor.score * 100)?.toFixed(1)}%</Td>
+                <Td>{(neighbor.score )?.toFixed(1)}%</Td>
                 <Td>{neighbor.clients_active ?? 'N/A'}</Td>
                 <Td>{neighbor.clients_inactive ?? 'N/A'}</Td>
                 <Td>{neighbor.clients_maybe ?? 'N/A'}</Td>
