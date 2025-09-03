@@ -14,7 +14,8 @@ import {
   Router as RouterIcon,
   Settings as SettingsIcon,
   Logout as LogoutIcon,
-  AdminPanelSettings as AdminIcon
+  AdminPanelSettings as AdminIcon,
+  Analytics as AnalyticsIcon
 } from '@mui/icons-material';
 import styled from 'styled-components';
 
@@ -99,6 +100,12 @@ const Home: React.FC<HomeProps> = ({ setIsAuthenticated }) => {
       color: '#1976d2'
     },
     {
+      title: 'Statistics',
+      icon: <AnalyticsIcon sx={{ fontSize: 40 }} />,
+      path: '/statistics',
+      color: '#6a4c93'
+    },
+    {
       title: 'Router List',
       icon: <RouterIcon sx={{ fontSize: 40 }} />,
       path: '/routers',
@@ -117,7 +124,7 @@ const Home: React.FC<HomeProps> = ({ setIsAuthenticated }) => {
     title: 'Admin Panel',
     icon: <AdminIcon sx={{ fontSize: 40 }} />,
     path: '/admin',
-    color: '#9c27b0'
+    color: '#737373'
   });
 
   return (

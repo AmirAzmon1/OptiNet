@@ -7,7 +7,8 @@ import {
   People as PeopleIcon,
   Group as GroupIcon,
   Router as RouterIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Analytics as AnalyticsIcon
 } from '@mui/icons-material';
 import styled from 'styled-components';
 
@@ -70,7 +71,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
     <DashboardContainer>
       <Sidebar>
         <Typography variant="h6" color="primary" sx={{ mb: 3, fontWeight: 'bold' }}>
-          ניווט מהיר
+          Quick Navigation
         </Typography>
 
         <SidebarItem 
@@ -103,6 +104,14 @@ const Dashboard: React.FC<DashboardProps> = () => {
         >
           <PeopleIcon sx={{ mr: 2 }} />
           All Users
+        </SidebarItem>
+
+        <SidebarItem 
+          to="/statistics" 
+          className={currentPath === '/statistics' ? 'active' : ''}
+        >
+          <AnalyticsIcon sx={{ mr: 2 }} />
+          Statistics
         </SidebarItem>
 
         <Divider sx={{ my: 2 }} />

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Load Balancer Simulation Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin-top: 30px; 
+            background: #f8f8f8; 
+        }
+        canvas { 
+            width: 80% !important;
+            height: 400px !important;
+            max-width: 1200px;
+            margin: 20px auto; 
+            background: white; 
+            border: 1px solid #ccc; 
+            display: block;
+        }
+        .formula { 
+            margin-top: 40px; 
+            font-size: 18px; 
+            text-align: left; 
+            max-width: 1000px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            background: #ffffff; 
+            padding: 20px; 
+            border: 1px solid #ccc; 
+            border-radius: 10px;
+        }
+        button { 
+            padding: 12px 25px; 
+            font-size: 20px; 
+            margin-top: 20px; 
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Load Balancer Simulation Dashboard</h1>
+
+<button id="startBtn">Start Simulation</button>
+
+<canvas id="scoreChart"></canvas>
+
+<div class="formula">
+    <h3>Score Calculation Formula:</h3>
+    <p><b>Score = (0.6 × LatencyScore) + (0.3 × ClientsScore) + (0.1 × TrafficScore)</b></p>
+    <ul>
+    </ul>
+    <p><b>Final Score = Score × 100</b></p>
+</div>
+
+<script>
+    let chart;
+    let neighborsList = [];
+    let updateInterval;
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+        if (updateInterval) return; // prevent multiple starts
+        initializeChart();
+        fetchData(); // first fetch immediately
+        updateInterval = setInterval(fetchData, 2000);
+    });
+
+    function initializeChart() {
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: {
+                responsive: true,
+                animation: false,
+                scales: {
+                    x: { 
+                        title: { display: true, text: 'Time (updates)' }
+                    },
+                    y: { 
+                        title: { display: true, text: 'Score' }, 
+                        suggestedMin: 0, 
+                        suggestedMax: 100 
+                    }
+                }
+            }
+        });
+    }
+
+    async function fetchData() {
+        try {
+            const response = await fetch('http://192.168.8.1:5000/neighbors');
+            const neighbors = await response.json();
+
+            if (neighborsList.length === 0) {
+                neighborsList = neighbors.map(n => ({
+                    ssid: n.ssid,
+                    data: [],
+                    color: generateColor(n.ssid)
+                }));
+
+                neighborsList.forEach(neighbor => {
+                    chart.data.datasets.push({
+                        label: neighbor.ssid,
+                        data: neighbor.data,
+                        borderColor: neighbor.color,
+                        fill: false,
+                        tension: 0.4
+                    });
+                });
+            }
+
+            chart.data.labels.push('');
+            if (chart.data.labels.length > 50) {
+                chart.data.labels.shift();
+                neighborsList.forEach(n => n.data.shift());
+            }
+
+            neighbors.forEach(neighbor => {
+                const found = neighborsList.find(n => n.ssid === neighbor.ssid);
+                if (found) {
+                    found.data.push(neighbor.score);
+                }
+            });
+
+            chart.update();
+
+        } catch (err) {
+            console.error('Error fetching data:', err);
+        }
+    }
+
+    function generateColor(name) {
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const color = `hsl(${hash % 360}, 70%, 50%)`;
+        return color;
+    }
+</script>
+
+</body>
+</html>

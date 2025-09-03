@@ -102,7 +102,7 @@ const RouterList: React.FC = () => {
 
   const fetchNeighbors = async () => {
     try {
-      const response = await fetch('http://192.168.1.57:5000/neighbors');
+      const response = await fetch('http://192.168.8.1:5000/neighbors');
       if (!response.ok) {
         throw new Error('Failed to fetch neighbors');
       }

@@ -12,6 +12,7 @@ import Admin from './pages/Admin';
 import UserPage from './pages/UserPage';
 import FamilyPage from './pages/FamilyPage';
 import NetworkPage from './pages/NetworkPage';
+import Statistics from './pages/Statistics';
 
 // Define the User interface
 interface User {
@@ -153,6 +154,14 @@ function App() {
               element={
                 isAuthenticated ? 
                   <NetworkPage /> : 
+                  <Navigate to="/login" replace />
+              } 
+            />
+            <Route 
+              path="/statistics" 
+              element={
+                isAuthenticated ? 
+                  <Statistics darkMode={darkMode} /> : 
                   <Navigate to="/login" replace />
               } 
             />

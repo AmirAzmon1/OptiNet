@@ -35,7 +35,8 @@ export interface UserAssignments {
 }
 
 // API Configuration
-const API_BASE_URL = 'http://192.168.1.57:5000';
+//const API_BASE_URL = 'http://192.168.1.57:5000';
+const API_BASE_URL = 'http://192.168.8.1:5000';
 
 // Custom hook for fetching router data
 export function useRouterData() {
